@@ -1,1 +1,3 @@
 # Passport
+
+My final project is Passport, a Django web application designed to track travel history and future itinerary planning. The application will center on two primary models: Destination (containing city/country, coordinates, and target visit dates) and JournalEntry (linked to a specific Destination, containing notes, ratings, and expense categories). The dashboard will feature an interactive Leaflet.js map displaying pins for all visited and planned locations, alongside a summary widget of total countries visited. Users can submit new trips via a standard Django form, manage locations via the admin interface, and export their travel history to a CSV file.

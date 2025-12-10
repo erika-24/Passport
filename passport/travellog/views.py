@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
+from django.http import FileResponse
 from .models import Destination
 from .forms import DestinationForm
 import requests
+import pandas as pd
+
 
 # Create your views here.
 def home(request):
@@ -63,3 +66,25 @@ def get_lat_lng(city: str, country: str):
         return float(data[0]["lat"]), float(data[0]["lon"])
     except Exception:
         return None, None
+    
+def export_to_xlsx(request):
+    data = Destination.objects.all().values(
+        "country",
+        "city",
+        "visited",
+        "start_date",
+        "end_date",
+        "latitude",
+        "longitude",
+    )
+
+    df = pd.DataFrame.from_records(data)
+
+    file_path = "passport_trips.xlsx"
+    df.to_excel(file_path, index=False)
+
+    return FileResponse(
+        open(file_path, "rb"),
+        as_attachment=True,
+        filename="passport_trips.xlsx",
+    )

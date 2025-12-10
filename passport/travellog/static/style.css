@@ -21,6 +21,7 @@ header {
     padding: 0.4rem 0.8rem;
     text-decoration: none;
     border-radius: 999px;
+    font-size: small;
 }
 
 main {
@@ -173,4 +174,11 @@ th, td {
     border-radius: 0.4rem;
     border: 1px solid #d1d5db;
     font: inherit;
+}
+
+/* Keep checkbox inline next to its label */
+.trip-form input[type="checkbox"] {
+    width: auto;
+    display: inline-block;
+    margin-left: 0.4rem;
 }

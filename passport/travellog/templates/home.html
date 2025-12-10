@@ -81,12 +81,15 @@
                             <span class="status-pill planned">Planned</span>
                         {% endif %}
                     </td>
-                    <td>{{ dest.target_visit_date|default:"—" }}</td>
+                    <!-- <td>{{ dest.target_visit_date|default:"—" }}</td> -->
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+        <br><br><br><br><br><br>
+        <a href="{% url 'export_to_xlsx' %}" class="export-btn">Export to Excel</a>
     </section>
+    
 </main>
 
 <!-- Add Trip Modal -->
