@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Passport Dashboard</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body>
+
+<header>
+    <h1>Passport</h1>
+</header>
+
+<main>
+    <!-- Map -->
+    <section class="card">
+        <div id="map"></div>
+        <div class="map-legend">
+            <span><span class="legend-dot visited"></span>Visited</span>
+            <span><span class="legend-dot planned"></span>Planned</span>
+        </div>
+    </section>
+
+    <!-- Stats Panel -->
+    <section class="card">
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Countries visited</div>
+                <div class="stat-value">{{ total_countries }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total trips</div>
+                <div class="stat-value">{{ total_trips }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Upcoming</div>
+                <div class="stat-value">{{ upcoming_trips }}</div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <!-- <h2>Add a Trip</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ trip_form.as_p }}
+            <button type="submit" class="primary-btn">Save</button>
+        </form> -->
+
+        <!-- Add Trip button (opens modal) -->
+        <div class="add-trip-header">
+            <h2>Trips</h2>
+            <button type="button" class="primary-btn" id="open-add-trip">
+                Add a Trip
+            </button>
+        </div>
+
+        <!-- Table -->
+        <h2>Travel History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Destination</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for dest in destinations %}
+                <tr>
+                    <td>{{ dest.city }}, {{ dest.country }}</td>
+                    <td>
+                        {% if dest.visited %}
+                            <span class="status-pill visited">Visited</span>
+                        {% else %}
+                            <span class="status-pill planned">Planned</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ dest.target_visit_date|default:"—" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</main>
+
+<!-- Add Trip Modal -->
+<div id="add-trip-overlay" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Add a Trip</h2>
+            <button type="button" class="modal-close" id="close-add-trip">&times;</button>
+        </div>
+
+        <form method="post" class="trip-form">
+            {% csrf_token %}
+            {{ trip_form.as_p }}
+            <button type="submit" class="primary-btn">Save Trip</button>
+        </form>
+    </div>
+</div>
+
+<!-- Pass Django data to JS -->
+<script>
+    const destinations = [
+        {% for dest in destinations %}
+        {
+            name: "{{ dest.city|escapejs }}, {{ dest.country|escapejs }}",
+            lat: {{ dest.latitude }},
+            lng: {{ dest.longitude }},
+            visited: {% if dest.visited %}true{% else %}false{% endif %},
+            date: "{% if dest.target_visit_date %}{{ dest.target_visit_date|date:'Y-m-d' }}{% endif %}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+</script>
+
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Your JS -->
+<script src="{% static 'script.js' %}"></script>
+
+</body>
+</html>
