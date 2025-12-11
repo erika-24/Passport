@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import FileResponse
-from .models import Destination
-from .forms import DestinationForm
+from .models import Destination, JournalEntry
+from .forms import DestinationForm, JournalEntryForm
 import requests
 import pandas as pd
 
@@ -9,28 +9,56 @@ import pandas as pd
 # Create your views here.
 def home(request):
     if request.method == "POST":
-        form = DestinationForm(request.POST)
-        if form.is_valid():
-            dest = form.save(commit=False)
+        form_type = request.POST.get("form_type")
 
-            lat, lng = get_lat_lng(dest.city, dest.country)
-            dest.latitude = lat
-            dest.longitude = lng
+        # Trip form submitted
+        if form_type == "destination":
+            trip_form = DestinationForm(request.POST)
+            journal_form = JournalEntryForm()  # empty
 
-            dest.save()
-            return redirect("home")  # redirect so refresh doesn't resubmit
+            if trip_form.is_valid():
+                dest = trip_form.save(commit=False)
+
+                lat, lng = get_lat_lng(dest.city, dest.country)
+                dest.latitude = lat
+                dest.longitude = lng
+
+                dest.save()
+                return redirect("home")
+
+        # Journal form submitted
+        elif form_type == "journal":
+            trip_form = DestinationForm()
+            journal_form = JournalEntryForm(request.POST, request.FILES)
+
+            if journal_form.is_valid():
+                journal_form.save()
+                return redirect("home")
+
+        else:
+            # Just re-render with blank forms
+            trip_form = DestinationForm()
+            journal_form = JournalEntryForm()
+
     else:
-        form = DestinationForm()
+        # GET request: show blank forms
+        trip_form = DestinationForm()
+        journal_form = JournalEntryForm()
 
     destinations = Destination.objects.all()
+    journal_entries = (
+        JournalEntry.objects.select_related("city").all().order_by("-id")
+    )
 
     total_countries = Destination.objects.values("country").distinct().count()
     total_trips = destinations.count()
     upcoming_trips = destinations.filter(visited=False).count()
 
     context = {
-        "trip_form": form,
+        "trip_form": trip_form,
+        "journal_form": journal_form,
         "destinations": destinations,
+        "journal_entries": journal_entries,
         "total_countries": total_countries,
         "total_trips": total_trips,
         "upcoming_trips": upcoming_trips,

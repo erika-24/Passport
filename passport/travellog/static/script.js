@@ -57,3 +57,39 @@ if (openBtn && closeBtn && overlay) {
         }
     });
 }
+
+// Journal modal logic
+const openJournalBtn = document.getElementById("open-journal-modal");
+const closeJournalBtn = document.getElementById("close-journal-modal");
+const journalOverlay = document.getElementById("journal-overlay");
+
+if (openJournalBtn && closeJournalBtn && journalOverlay) {
+    openJournalBtn.addEventListener("click", () => {
+        journalOverlay.classList.remove("hidden");
+    });
+
+    closeJournalBtn.addEventListener("click", () => {
+        journalOverlay.classList.add("hidden");
+    });
+
+    journalOverlay.addEventListener("click", (e) => {
+        if (e.target === journalOverlay) {
+            journalOverlay.classList.add("hidden");
+        }
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            journalOverlay.classList.add("hidden");
+        }
+    });
+}
+
+// Render rating stars for journal entries
+document.querySelectorAll(".journal-rating").forEach((el) => {
+    const rating = parseInt(el.dataset.rating || "0", 10);
+    const max = 5;
+    const filled = "★".repeat(Math.max(0, Math.min(rating, max)));
+    const empty = "☆".repeat(Math.max(0, max - rating));
+    el.textContent = filled + empty;
+});

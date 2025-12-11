@@ -1,5 +1,5 @@
 from django import forms
-from .models import Destination
+from .models import Destination, JournalEntry
 
 class DestinationForm(forms.ModelForm):
     class Meta:
@@ -8,4 +8,13 @@ class DestinationForm(forms.ModelForm):
         widgets = {
             "start_date": forms.DateInput(attrs={"type": "date"}),
             "end_date": forms.DateInput(attrs={"type": "date"}),
+        }
+
+
+class JournalEntryForm(forms.ModelForm):
+    class Meta:
+        model = JournalEntry
+        fields = ["city", "rating", "notes", "image"]
+        widgets = {
+            "rating": forms.NumberInput(attrs={"min": 1, "max": 5}),
         }

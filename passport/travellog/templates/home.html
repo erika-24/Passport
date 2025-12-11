@@ -59,6 +59,7 @@
                 Add a Trip
             </button>
         </div>
+        <br>
 
         <!-- Table -->
         <h2>Travel History</h2>
@@ -67,7 +68,7 @@
                 <tr>
                     <th>Destination</th>
                     <th>Status</th>
-                    <th>Date</th>
+                    <th>Start Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -81,12 +82,47 @@
                             <span class="status-pill planned">Planned</span>
                         {% endif %}
                     </td>
-                    <!-- <td>{{ dest.target_visit_date|default:"—" }}</td> -->
+                    <td>{{ dest.start_date|default:"—" }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
-        <br><br><br><br><br><br>
+
+        <!-- Journal Entries -->
+        <section class="journal-section">
+            <div class="journal-header">
+                <h2>Journal Entries</h2>
+                <button type="button" class="secondary-btn" id="open-journal-modal">
+                    Add Journal Entry
+                </button>
+            </div>
+
+            <div class="journal-grid">
+                {% for entry in journal_entries %}
+                    <article class="journal-card">
+                        <div class="journal-destination">
+                            {{ entry.city.city }}, {{ entry.city.country }}
+                        </div>
+                        <div class="journal-rating" data-rating="{{ entry.rating }}"></div>
+                        {% if entry.notes %}
+                            <p class="journal-notes">{{ entry.notes|linebreaksbr }}</p>
+                        {% endif %}
+                        {% if entry.image %}
+                            <img
+                                src="{{ entry.image.url }}"
+                                alt="Journal image for {{ entry.city }}"
+                                class="journal-image"
+                            >
+                        {% endif %}
+                    </article>
+                {% empty %}
+                    <p class="journal-empty">No journal entries yet. Add your first one!</p>
+                {% endfor %}
+            </div>
+        </section>
+
+
+        <br><br><br>
         <a href="{% url 'export_to_xlsx' %}" class="export-btn">Export to Excel</a>
     </section>
     
@@ -102,8 +138,26 @@
 
         <form method="post" class="trip-form">
             {% csrf_token %}
+            <input type="hidden" name="form_type" value="destination">
             {{ trip_form.as_p }}
             <button type="submit" class="primary-btn">Save Trip</button>
+        </form>
+    </div>
+</div>
+
+<!-- Journal Entry Modal -->
+<div id="journal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Add Journal Entry</h2>
+            <button type="button" class="modal-close" id="close-journal-modal">&times;</button>
+        </div>
+
+        <form method="post" class="journal-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="journal">
+            {{ journal_form.as_p }}
+            <button type="submit" class="primary-btn">Save Journal</button>
         </form>
     </div>
 </div>
@@ -117,7 +171,7 @@
             lat: {{ dest.latitude }},
             lng: {{ dest.longitude }},
             visited: {% if dest.visited %}true{% else %}false{% endif %},
-            date: "{% if dest.target_visit_date %}{{ dest.target_visit_date|date:'Y-m-d' }}{% endif %}"
+            date: "{% if dest.start_date %}{{ dest.start_date|date:'Y-m-d' }}{% endif %}"
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
