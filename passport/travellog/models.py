@@ -14,8 +14,8 @@ class Destination(models.Model):
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     visited = models.BooleanField()
-    start_date = models.DateField(blank=True)
-    end_date = models.DateField(blank=True)
+    start_date = models.DateField(null=True,blank=True)
+    end_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.id}: {self.country}, {self.city} visited from {self.start_date} to {self.end_date}"
