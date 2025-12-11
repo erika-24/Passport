@@ -25,4 +25,5 @@ jobs:
           # pip install -e .
 
       - name: Run pytest
+        working-directory: ./passport
         run: pytest -v
